@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/usr/local/openssl/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

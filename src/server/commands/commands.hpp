@@ -3,7 +3,8 @@
 
 #include <tuple>
 
-namespace modules::command {
+namespace server::cmd {
+
     enum class SMTPServerCommand {
         INVALID,
         HELLO,
@@ -42,7 +43,7 @@ namespace modules::command {
      * @param command
      * @return
      */
-    const char* serverCommandToString(const SMTPServerCommand& command);
+    const char* cmd_to_str(const SMTPServerCommand& command);
 }
 
 #endif //__COMMANDS_H__
