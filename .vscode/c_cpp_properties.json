@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**",
                 "/usr/local/openssl/include"
             ],
-            "defines": [],
+            "defines": ["DEBUG_MODE"],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",

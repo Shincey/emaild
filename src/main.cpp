@@ -1,7 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include <sys/utsname.h>
+#include "public/zsystem.h"
+
+
 
 
 int main (int argc, char* argv[]) {
@@ -16,5 +20,6 @@ int main (int argc, char* argv[]) {
         printf("Domain name: %s \n", uts.domainname);
     #endif
     printf("%s \n", "hello world");
+
     exit(EXIT_SUCCESS);
 }

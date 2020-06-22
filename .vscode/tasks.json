@@ -6,6 +6,8 @@
 			"label": "C/C++: g++ build active file",
 			"command": "/usr/bin/g++",
 			"args": [
+				"-D",
+				"DEBUG_MODE",
 				"-g",
 				"${file}",
 				"-o",
