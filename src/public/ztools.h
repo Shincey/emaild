@@ -35,10 +35,10 @@ namespace ztool {
     }
 
     namespace ztime {
-        inline bool s_localtime(struct tm &tm, const time_t &tt) {
-            const struct tm *pt = localtime(&tt);
-            if (nullptr != pt) return false;
-            zmemery::s_memcpy(&tm, sizeof(tm), pt, sizeof(tm));
+        inline bool s_localtime(struct tm &__ts, const time_t &__tt) {
+            const struct tm *pt = localtime(&__tt);
+            if (nullptr == pt) { return false; }
+            zmemery::s_memcpy(&__ts, sizeof(__ts), pt, sizeof(__ts));
             return true;
         }
 
@@ -50,12 +50,12 @@ namespace ztool {
             return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
         }
 
-        inline std::string current_time(const char * format="%4d-%02d-%02d %02d:%02d:%02d") {
+        inline std::string now(const char * __format="%4d-%02d-%02d %02d:%02d:%02d") {
             char strtime[64] = {0};
             auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             struct tm ts;
             s_localtime(ts, tt);
-            snprintf(strtime, sizeof(strtime), format, 
+            snprintf(strtime, sizeof(strtime), __format, 
                      (int)ts.tm_year + 1900, 
                      (int)ts.tm_mon + 1, 
                      (int)ts.tm_mday, 
@@ -64,6 +64,122 @@ namespace ztool {
                      (int)ts.tm_sec);
             return strtime;
         }
+
+        /**
+         * Convert timestamp to readable time representation
+         * @param __timestamp : timestamp in milliseconds
+         * @param format : time format to convert
+         * @return : returns the formatted time.
+         */
+        inline std::string time(const s64 __timestamp , const char *__format = "%4d-%02d-%02d %02d:%02d:%02d") {
+            char strtime[128];
+            auto ms = std::chrono::milliseconds(__timestamp);
+            auto tp = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(ms);
+            auto tt = std::chrono::system_clock::to_time_t(tp);
+            struct tm ts;
+            s_localtime(ts, tt);
+            snprintf(strtime, sizeof(strtime), __format,
+                     (int)ts.tm_year+1900,
+                     (int)ts.tm_mon+1,
+                     (int)ts.tm_mday,
+                     (int)ts.tm_hour,
+                     (int)ts.tm_min,
+                     (int)ts.tm_sec);
+            return strtime;
+        }
+    }
+
+    namespace zfile {
+        const char* get_app_path();
+    }
+
+    template <typename T>
+    struct zHashFunction {
+        size_t operator()(const T &__src) const { return (size_t)__src; }
+    };
+
+    inline s32 split(const std::string &__src, const std::string &__delimiter, std::vector<std::string> &__res) {
+        if (__src.empty()) return 0;
+        std::string strs = __src + __delimiter;
+        size_t pos = strs.find(__delimiter);
+        size_t len = strs.size();
+        while (pos != std::string::npos) {
+            std::string x = strs.substr(0, pos);
+            if (x != "") __res.push_back(x.c_str());
+            strs = strs.substr(pos + __delimiter.size(), len);
+            pos = strs.find(__delimiter);
+        }
+        return __res.size();
+    }
+
+    inline s32 str_to_int(const char *__val) {
+        zassert(__val, "null pointer");
+        return atoi(__val);
+    }
+
+    inline float str_to_float(const char *__val) {
+        zassert(__val, "null pointer");
+        return atof(__val);
+    }
+
+    inline s64 str_to_int64(const char *__val) {
+        zassert(__val, "null pointer");
+        return atoll(__val);
+    }
+
+    inline std::string int_to_str(const s32 __val) {
+        char str[128] = {0};
+        snprintf(str, sizeof(str), "%d", __val);
+        return str;
+    }
+
+    inline std::string int64_to_str(const s64 __val) {
+        char str[128] = {0};
+        snprintf(str, sizeof(str), "%d", __val);
+        return str;
+    }
+
+    inline std::string float_to_str(const double __val) {
+        char str[128] = {0};
+        snprintf(str, sizeof(str), "%f", __val);
+        return str;
+    }
+
+    inline void str_replace(std::string &__content, const std::string &__src, const std::string &__dest) {
+        std::size_t pos = 0;
+        std::size_t sz_src = __src.size();
+        std::size_t sz_dest = __dest.size();
+        while ((pos = __content.find(__src, pos)) != std::string::npos) {
+            __content.replace(pos, sz_src, __dest);
+            pos += sz_dest;
+        }
+    }
+
+    inline s32 rand(s32 __range) {
+        if (0 == __range) { return 0; }
+        static u64 s_seed = ztime::milliseconds();
+        s_seed = (((s_seed = s_seed * 214013L + 2531011L) >> 16) & 0x7fff);
+        return s_seed % __range;
+    }
+
+    inline std::string& operator<<(std::string &__target, const std::string &__val) {
+        __target += __val;
+        return __target;
+    }
+
+    inline std::string& operator<<(std::string &__target, const s32 __val) {
+        __target += ztool::int_to_str(__val);
+        return __target;
+    }
+
+    inline std::string& operator<<(std::string &__target, const s64 __val) {
+        __target += ztool::int64_to_str(__val);
+        return __target;
+    }
+
+    inline std::string& operator<<(std::string &__target, const double __val) {
+        __target += ztool::float_to_str(__val);
+        return __target;
     }
 
 

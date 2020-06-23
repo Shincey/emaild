@@ -13,7 +13,7 @@ namespace ztool {
 
     namespace zfile {
         const char* get_app_path() {
-            static char* s_path = nullptr;
+            static char *s_path = nullptr;
             const size_t kPathLen = 256;
             if (nullptr == s_path) {
                 char buf[kPathLen];

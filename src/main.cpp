@@ -3,7 +3,9 @@
 #include <assert.h>
 
 #include <sys/utsname.h>
+#include <iostream>
 #include "public/zsystem.h"
+#include "public/ztools.h"
 
 
 
@@ -20,6 +22,12 @@ int main (int argc, char* argv[]) {
         printf("Domain name: %s \n", uts.domainname);
     #endif
     printf("%s \n", "hello world");
+
+    printf("%s \n", ztool::ztime::now().c_str());
+
+    std::vector<std::string> res;
+    ztool::split("hello,what,word", ",", res);
+    for (auto r : res) std::cout << r << std::endl;
 
     exit(EXIT_SUCCESS);
 }
