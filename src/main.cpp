@@ -6,6 +6,7 @@
 #include <iostream>
 #include "public/zsystem.h"
 #include "public/ztools.h"
+#include "public/zbase64.h"
 
 
 
@@ -28,6 +29,18 @@ int main (int argc, char* argv[]) {
     std::vector<std::string> res;
     ztool::split("hello,what,word", ",", res);
     for (auto r : res) std::cout << r << std::endl;
+
+    std::string s = "你好哦噢好";
+
+
+    // std::string encoded = zlib::base64_encode(reinterpret_cast<const unsigned char*>(s.c_str()), s.length());
+    // std::string decoded = zlib::base64_decode(decoded);
+    
+    // printf("%s\n", encoded.c_str());
+
+    // printf("%s\n", decoded.c_str());
+
+    ztool::zsystem::get_current_process_id();
 
     exit(EXIT_SUCCESS);
 }

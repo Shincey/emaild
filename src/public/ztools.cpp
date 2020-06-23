@@ -5,7 +5,7 @@
 #include <libgen.h>
 
 namespace ztool {
-    namespace system {
+    namespace zsystem {
         s32 get_current_process_id() {
             return ::getpid();
         }
