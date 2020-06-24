@@ -1,7 +1,7 @@
 #ifndef __ZTHREAD_H__
 #define __ZTHREAD_H__
 
-#include <zsystem.h>
+#include "./zsystem.h"
 
 namespace zlib {
     enum {

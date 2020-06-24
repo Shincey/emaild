@@ -1,4 +1,4 @@
-#include "./zbase64.h"
+#include "zbase64.h"
 
 namespace zlib {
 
@@ -19,6 +19,7 @@ namespace zlib {
         else if (__chr >= '0' && __chr <= '9') return __chr - '0' + ('Z' - 'A') + ('z' - 'a') + 2;
         else if (__chr == '+' || __chr == '-') return 62;
         else if (__chr == '/' || __chr == '_') return 63;
+        else return 64; // invalid pos
     }
 
     static inline std::string insert_linebreaks(std::string __str, std::size_t __distance) {
@@ -60,7 +61,7 @@ namespace zlib {
      * @param __url : choose the set of base64 characters
      * @return returns based64 encoded string
      */
-    std::string base64_encode(unsigned char const *__plain, std::size_t __len, bool __url=false) {
+    std::string base64_encode(unsigned char const *__plain, std::size_t __len, bool __url) {
 
         std::size_t len_encoded = (__len + 2) / 3 * 4;
 
@@ -99,7 +100,7 @@ namespace zlib {
     }
 
 
-    std::string base64_decode(std::string const &__cipher, bool __remove_linebreaks=false) {
+    std::string base64_decode(std::string const &__cipher, bool __remove_linebreaks) {
         if (__remove_linebreaks) {
             if (!__cipher.length() ) {
                 return "";

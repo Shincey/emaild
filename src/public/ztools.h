@@ -135,7 +135,7 @@ namespace ztool {
 
     inline std::string int64_to_str(const s64 __val) {
         char str[128] = {0};
-        snprintf(str, sizeof(str), "%d", __val);
+        snprintf(str, sizeof(str), "%ld", __val);
         return str;
     }
 
