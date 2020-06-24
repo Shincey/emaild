@@ -1,7 +1,7 @@
 #ifndef __ZTHREAD_H__
 #define __ZTHREAD_H__
 
-#include "./zsystem.h"
+#include "zsystem.h"
 
 namespace zlib {
     enum {
@@ -15,7 +15,7 @@ namespace zlib {
         virtual ~zthread() {}
 
     public:
-        bool start(s32 threads=1);
+        bool start(s32 __threads=1);
         virtual void terminate() = 0;
         virtual void run() = 0;
 

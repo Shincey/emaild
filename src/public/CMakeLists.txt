@@ -11,6 +11,7 @@ SET(public
     "${PROJECT_SOURCE_DIR}/src/public/zbase64.h"
     "${PROJECT_SOURCE_DIR}/src/public/zbase64.cpp"
     "${PROJECT_SOURCE_DIR}/src/public/zbuffer.h"
+    "${PROJECT_SOURCE_DIR}/src/public/zpool.h"
 )
 
 ADD_LIBRARY(LIB_PUBLIC STATIC ${public})

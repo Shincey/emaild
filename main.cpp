@@ -20,10 +20,10 @@ int main (int argc, char* argv[]) {
     #endif
     printf("%s \n", ztool::ztime::now().c_str());
 
-    std::string s = "ABCDEDF";
+    std::string s = "你好，这里是中文";
 
     std::string encoded = zlib::base64_encode(reinterpret_cast<const unsigned char*>(s.c_str()), s.length());
-    std::string decoded = zlib::base64_decode(decoded);
+    std::string decoded = zlib::base64_decode(encoded);
     
     printf("%s\n", encoded.c_str());
 

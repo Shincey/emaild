@@ -7,10 +7,10 @@ cmake_minimum_required(VERSION 3.0.0)
 project(emaild VERSION 0.1.0)
 
 SET(CMAKE_CXX_COMPILER "g++")
-SET(CMAKE_CXX_FLAGS "-g -fuse-ld=gold -std=c++17 -Wall -lpthread -rdynamic -ldl -DDEBUG_MODE")
+SET(CMAKE_CXX_FLAGS "-g -fuse-ld=gold -std=c++17 -Wall -lpthread -rdynamic -ldl")
 SET(CMAKE_CXX_FLAGS_DEBUG "-g -use-ld=gold -std=c++17 -lpthread -rdynamic -ldl -DDEBUG_MODE")
-SET(CMAKE_CXX_FLAGS_RELWITHDEBUGINFO "-g -o2 -fuse-ld=gold -std=c++11 -lpthread -rdynamic -ldl -DDEBUG_MODE")
-SET(CMAKE_CXX_FLAGS_RELEASE "-g -o3 -fuse-ld=gold -std=c++11 -lpthread -rdynamic -ldl")
+SET(CMAKE_CXX_FLAGS_RELWITHDEBUGINFO "-g -o2 -fuse-ld=gold -std=c++17 -lpthread -rdynamic -ldl -DDEBUG_MODE")
+SET(CMAKE_CXX_FLAGS_RELEASE "-g -o3 -fuse-ld=gold -std=c++17 -lpthread -rdynamic -ldl")
 
 SET(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE Release)

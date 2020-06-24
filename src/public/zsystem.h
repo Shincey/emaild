@@ -1,10 +1,10 @@
 #ifndef __ZSYSTEM_H__
 #define __ZSYSTEM_H__
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <assert.h>
 
 #ifdef WIN32
