@@ -31,5 +31,8 @@
 *.out
 *.app
 
-# Cmake generated files
+# CMake generated files
 build/
+
+# CMake generated executable binary files
+bin/
