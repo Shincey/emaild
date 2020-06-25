@@ -8,6 +8,8 @@
 #include "zbase64.h"
 #include "zpool.h"
 
+#include "zinterface.h"
+
 int main (int argc, char* argv[]) {
     // struct utsname uts;
     // if (uname(&uts) == -1) exit(EXIT_FAILURE);

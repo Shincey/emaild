@@ -1,0 +1,229 @@
+#ifndef __ZINTERFACE_H__
+#define __ZINTERFACE_H__
+
+
+#include "zsystem.h"
+#include <string>
+
+class iModule;
+
+namespace zif {
+    struct zAddress {
+        std::string ip_;
+        s32 port_;
+        zAddress() : ip_(""), port_(0) {}
+        zAddress(const std::string &__ip, const s32 __port) : ip_(__ip), port_(__port) {}
+    };
+
+    class iCore;
+
+    class iPipe {
+    public:
+        virtual ~iPipe() {}
+        virtual void cache() = 0;
+        virtual void load() = 0;
+        virtual void close() = 0;
+    };
+
+    class iUDPPipe : public iPipe {
+    public:
+        virtual ~iUDPPipe() {}
+        virtual void sendto(const char *__ip, const s32 __port, const void *__content, const s32 __size) = 0;
+    };
+
+    class iTCPPipe : public iPipe {
+    public:
+        virtual ~iTCPPipe() {}
+        virtual void send(const void *__data, const s32 __size, bool __immediate) = 0;
+    };
+
+    class iSocket {
+    public:
+        virtual ~iSocket() {}
+        zAddress addr_;
+    };
+
+    class iUDPSocket : public iSocket {
+    public:
+        iUDPSocket() : pipe_(nullptr) {}
+        virtual ~iUDPSocket() {}
+        iUDPPipe * const pipe_;
+    };
+
+    class iTCPSocket : public iSocket {
+    public:
+        virtual ~iTCPSocket() {}
+        iTCPSocket() : pipe_(nullptr) {}
+        iTCPPipe * const pipe_;
+    };
+
+    class iUDPSession : public iUDPSocket {
+    public:
+        virtual ~iUDPSession() {}
+        virtual void on_create(bool success) = 0;
+        virtual void on_recv(iCore *__core, const char *__ip, const s32 __port, const char *__content, const int __size) = 0;
+        virtual void on_close(iCore *__core) = 0;
+
+        void close() const { 
+            if (this && pipe_) { pipe_->close(); }
+        }
+
+        inline void sendto(const char *__ip, const s32 __port, const char *__content, const int __size) {
+            if (this && pipe_) { pipe_->sendto(__ip, __port, __content, __size); }
+        }
+
+        inline void load() {
+            if (this && pipe_) { pipe_->load(); }
+        }
+    };
+
+    class iAccepter {
+    public:
+        virtual ~iAccepter() {}
+        virtual void relearse() = 0;
+    };
+
+    class iTCPSession : public iTCPSocket {
+    public:
+        virtual ~iTCPSession() {}
+        iTCPSession() : initiative_(false) {}
+        virtual int on_recv(iCore *__core, const void *__content, const int __size) = 0;
+        virtual void on_connect(iCore *__core) = 0;
+        virtual void on_disconnect(iCore *__core) = 0;
+        virtual void on_connect_failed(iCore *__core) = 0;
+
+        void close() const {
+            if (this && pipe_) { pipe_->close(); }
+        }
+
+        inline void send(const void *__content, const int __size, bool __immediate=true) const {
+            if (this && pipe_) { pipe_->send(__content, __size, __immediate); }
+        }
+
+        inline void cache() {
+            if (this && pipe_) { pipe_->cache(); }
+        }
+
+        inline void load() {
+            if (this && pipe_) { pipe_->load(); }
+        }
+
+        const bool initiative_;
+    };
+
+    class iUDPServer {
+    public:
+        iUDPServer() : ac_(nullptr) {}
+        virtual ~iUDPServer() {}
+
+        virtual iUDPSession * on_malloc_connection(iCore *__core, const char *__ip, const s32 __port) = 0;
+        virtual void on_release(iCore *__core) = 0;
+        virtual void close() { ac_->relearse(); }
+
+        iAccepter *ac_;
+    };
+
+    class iTCPServer {
+    public:
+        iTCPServer() : ac_(nullptr) {}
+        virtual ~iTCPServer() {}
+
+        virtual iTCPSession * on_malloc_connection(iCore *__core, const char *__remote_ip, const s32 __remote_port) = 0;
+        virtual void on_error(iCore *__core, iTCPSession *__session) = 0;
+        virtual void on_relear(iCore *__core) = 0;
+        virtual void close() { ac_->relearse(); }
+        iAccepter *ac_;
+    };
+
+    class iUDPBoradcaster {
+    public:
+        virtual void broadcast(const void *__content, const s32 __size) = 0;
+    };
+
+    class iContext {
+        union {
+            const void *context_point_;
+            const s64 context_mark_;
+        };
+        iContext(const void *__point) : context_point_(__point) {}
+        iContext(const s64 __mark) : context_mark_(__mark) {}
+    };
+
+    class iTimer {
+    public:
+        virtual void on_start(iCore *__core, const s32 __id, const iContext *__context, const s64 __tick) = 0;
+        virtual void on_timer(iCore *__core, const s32 __id, const iContext *__context, const s64 __tick) = 0;
+        virtual void on_end(iCore *__core, const s32 __id, const iContext *__context, bool __nonviolent, const s64 __tick) = 0;
+        virtual void on_pause(iCore * __core, const s32 __id, const iContext & __context, const s64 __tick) = 0;
+        virtual void on_resume(iCore * __core, const s32 __id, const iContext & __context, const s64 __tick) = 0;
+    };
+
+    class iHTTPRequest {
+    public:
+        virtual ~iHTTPRequest() {}
+        virtual void post_param(const char *__key, const char *__value) = 0;
+        virtual void do_request() = 0;
+    };
+
+    class iHTTPResponse {
+    public:
+        iHTTPResponse() : reference_(0) {}
+        virtual ~iHTTPResponse() {}
+        virtual void on_error(const s32 __id, const s32 __error, const iContext &__context) = 0;
+        virtual void on_response(const s32 __id, const void *__data, const s32 __size, const iContext &__context) = 0;
+        virtual bool is_requesting() { return reference_; }
+        s32 reference_;
+    };
+
+    class iCore {
+    public:
+        virtual ~iCore() {}
+        virtual iModule * find_module(const std::string &__name) = 0;
+        virtual const char * get_env() = 0;
+        virtual const char * get_args(const char *__name) = 0;
+
+        virtual void set_core_name(const char *__name) = 0;
+        virtual const char * get_core_name();
+    };
+
+}
+
+class iModule {
+public:
+    virtual ~iModule() {}
+    virtual bool init(zif::iCore *__core) = 0;
+    virtual bool launch(zif::iCore *__core) = 0;
+    virtual bool destroy(zif::iCore *__core) = 0;
+
+public:
+    iModule() : next_(nullptr) {}
+    inline void set_next(iModule *&__iModule) { next_ = __iModule; }
+    inline iModule *get_next() { return next_; }
+    inline void set_name(const char *__name) { name_ = __name; }
+    inline const char *get_name() const { return name_.c_str(); }
+private:
+    iModule *next_;
+    std::string name_;
+};
+
+typedef iModule *(*iModulePtr)(void);
+
+#define CREATE_iModule(name) \
+class factory##name { \
+public: \
+    factory##name(iModule *&__iModule) { \
+        iModule *iModule##name = new name; \
+        iModule##name->set_name(name); \
+        iModule##name->set_next(__iModule); \
+        __iModule = iModule##name; \
+    } \
+}; \
+factory##name factory##name(s_iModules);
+
+#define GET_DLL_INSTANCE \
+    static iModule *s_iModules = nullptr; \
+    extern "C" iModule *GetiModule() { \
+        return s_iModules; \
+    }
+
+#endif // __ZINTERFACE_H__
