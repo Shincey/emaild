@@ -5,17 +5,17 @@
 
 namespace zlib {
 
-    template <typename __T__, s32 __list_nums__ = 1, s32 __chunk_nums__ = 64>
+    template <typename __T, s32 __list_nums__ = 1, s32 __chunk_nums__ = 64>
     class zpool {
 
         enum class CHUNK_STATE {
-            USEING,
+            USING,
             FREEING
-        }
+        };
 
         struct ChunkList;
         struct Chunk {
-            s8 buffer[sizeof(__T__)];
+            s8 buffer[sizeof(__T)];
             ChunkList *parent;
             Chunk *prev;
             Chunk *next;
@@ -31,7 +31,45 @@ namespace zlib {
         };
 
     public:
+
         zpool() : head_(nullptr), list_head_(nullptr), list_count_(0) { init_pool(__list_nums__); }
+
+        ~zpool() {
+            while (list_head_ != nullptr) { 
+                auto tmp = list_head_;
+                list_head_ = list_head_->next;
+                free(tmp);
+            }
+        }
+
+        __T * Create() {
+            Chunk * chunk = create();
+            __T *t = new (chunk->buffer) __T();
+            return t;
+        }
+
+        // template <typename... Args>
+        // __T * Create(Args... args) {
+        //     Chunk *chunk = create();
+        //     __T *t = new (chunk->buffer) __T(args...);
+        //     return t;
+        // }
+
+        template <typename... Args>
+        __T * Create(Args&&... args) {
+            Chunk *chunk = create();
+            __T *t = new (chunk->buffer) __T(std::forward<Args>(args)...);
+            return t;
+        }
+
+        void Recover(__T *t) {
+            t->~__T();
+            recover((struct Chunk *)t);
+        }
+
+        s32 Count() { return list_count_ * __chunk_nums__; }
+
+    private:
 
         void init_pool(s32 __list_nums) {
             for (int i = 0; i < __list_nums; ++i) {
@@ -72,6 +110,9 @@ namespace zlib {
             --list_count_;
         }
 
+
+    private:
+
         Chunk * create() {
             Chunk *ret = nullptr;
             if (head_ == nullptr) { init_pool(1); }
@@ -79,8 +120,17 @@ namespace zlib {
             remove(head_);
             zassert(ret->state == CHUNK_STATE::FREEING && ret->len == sizeof(struct Chunk), "Chunk invalid");
             ++ret->parent->count;
-            ret->state = CHUNK_STATE::USEING;
+            ret->state = CHUNK_STATE::USING;
             return ret;
+        }
+
+        void recover(Chunk *__chunk) {
+            zassert(__chunk->state == CHUNK_STATE::USING && __chunk->len == sizeof(struct Chunk), "Chunk invalid");
+            zassert(__chunk->parent->count > 0, "ChunkList error");
+            --__chunk->parent->count;
+            __chunk->state = CHUNK_STATE::FREEING;
+            if (__chunk->parent->count == 0 && list_count_ > __list_nums__) { free_chunk_list(__chunk->parent); }
+            else { add(__chunk); }
         }
 
         inline void add(Chunk *__chunk) {
@@ -104,6 +154,10 @@ namespace zlib {
         s32 list_count_;
     };
 }
+
+
+#define create_from_pool(pool, ...) pool.Create(__VA_ARGS__)
+#define recover_to_pool(pool, p) pool.Recover(p)
 
 
 
