@@ -24,11 +24,13 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 #设置头文件目录
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/public"
                     "${PROJECT_SOURCE_DIR}/src/interface"
-                    "${PROJECT_SOURCE_DIR}/src/server"
+                    "${PROJECT_SOURCE_DIR}/src/server/core"
+                    "${PROJECT_SOURCE_DIR}/src/server/logic"
+                    "${PROJECT_SOURCE_DIR}/src/server/log"
 )
-#增加子文件夹
-ADD_SUBDIRECTORY("${PROJECT_SOURCE_DIR}/src/public"
-)
+
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/public)
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/server)
 
 AUX_SOURCE_DIRECTORY(. MAIN)
 
@@ -41,7 +43,7 @@ AUX_SOURCE_DIRECTORY(. MAIN)
 add_executable(emaild ${MAIN})
 
 #指明可执行文件需要链接的库
-TARGET_LINK_LIBRARIES(emaild LIB_PUBLIC)
+TARGET_LINK_LIBRARIES(emaild LIB_PUBLIC LIB_SERVER)
 
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
