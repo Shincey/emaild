@@ -140,7 +140,7 @@ namespace zif {
         virtual void broadcast(const void *__content, const s32 __size) = 0;
     };
 
-    class iContext {
+    struct iContext {
         union {
             const void *context_point_;
             const s64 context_mark_;
@@ -184,9 +184,77 @@ namespace zif {
 
         virtual void set_core_name(const char *__name) = 0;
         virtual const char * get_core_name();
-    };
 
+
+        virtual bool launch_udp_session(iUDPSession *__session, const char *__ip, const s32 __port) = 0;
+        virtual bool launch_tcp_session(iTCPSession *__session, const char *__ip, const s32 __port, int __max_ss, int __max_rs) = 0;
+        virtual bool launch_tcp_server(iTCPServer *__server, const char *__ip, const s32 __port, int __max_ss, int __max_rs) = 0;
+
+        virtual iHTTPRequest * get_http_request(const s64 __account, const s64 __id, const char * __url, iHTTPResponse * __response, const iContext & __context) = 0;
+
+        virtual void start_timer(iTimer *__timer, const s32 __id, s64 __delay, s32 __count, s64 __interval, const iContext __context, const char * __file, const s32 __line) = 0;
+        virtual void kill_timer(iTimer *__timer, const s32 __id, const iContext __context=(s64)0) = 0;
+        virtual void pause_timer(iTimer *__timer, const s32 __id, const iContext __context=(s64)0) = 0;
+        virtual void resume_timer(iTimer *__timer, const s32 __id, const iContext __context=(s64)0) = 0;
+        virtual void trace_timer() = 0;
+
+        virtual void log_sync(const s64 __tick, const char *__log, const bool __echo) = 0;
+        virtual void log_async(const s64 __tick, const char *__log, const bool __echo) = 0;
+        virtual void set_sync_file_prefix(const char *__prefix) = 0;
+        virtual void set_async_file_prefix(const char *__prefix) = 0;
+    };
 }
+
+#ifdef DEBUG_MODE
+#define debug(core, format, ...) { \
+            printf("debug: %s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
+            printf("\n"); \
+        }
+
+#define trace(core, format, ...) { \
+            char log[4096] = { 0 }; \
+            snprintf(log, sizeof(log), "trace: %s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
+            printf("%s\n", log); \
+            core->log_async(ztools::ztime::milliseconds(), log, false); \
+        }
+
+#define error(core, format, ...) { \
+        char log[4096] = { 0 }; \
+        snprintf(log, sizeof(log), "error: %s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
+        printf("%s\n", log); \
+        core->log_sync(ztools::ztime::milliseconds(), log, true); \
+        }
+
+#define imp(core, format, ...) { \
+        char log[4096] = { 0 }; \
+        snprintf(log, sizeof(log), "%s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
+        printf("%s\n", log); \
+        core->log_sync(ztools::ztime::milliseconds(), log, true); \
+        }
+
+#else
+#define debug(core, format, ...) (void)0;
+
+#define trace(core, format, ...) { \
+            char log[4096] = { 0 }; \
+            snprintf(log, sizeof(log), "trace: %s : %d "#format, __FILE__, __LINE__, ##__VA_AR); \
+            core->log_async(ztools::ztime::milliseconds(), log, false); \
+        }
+
+#define error(core, format, ...) { \
+            char log[4096] = { 0 }; \
+            zassert(false, format, ##__VA_ARGS__); \
+            snprintf(log, sizeof(log), "error: %s : %d"#format, __FILE__, __LINE__, ##__VA_ARGS__); \
+            core->log_sync(ztools::ztime::milliseconds(), log, false); \
+        }
+
+#define imp(core, format, ...) { \
+            char log[4096] = { 0 }; \
+            snprintf(log, sizeof(log), "%s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
+            core->log_sync(ztools::ztime::milliseconds(), log, false)
+        }
+
+#endif // DEBUG_MODE
 
 class iModule {
 public:

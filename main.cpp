@@ -9,6 +9,7 @@
 #include "zpool.h"
 
 #include "zinterface.h"
+#include "core.h"
 
 int main (int argc, char* argv[]) {
     // struct utsname uts;

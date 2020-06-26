@@ -24,6 +24,7 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 #设置头文件目录
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/public"
                     "${PROJECT_SOURCE_DIR}/src/interface"
+                    "${PROJECT_SOURCE_DIR}/src/server"
 )
 #增加子文件夹
 ADD_SUBDIRECTORY("${PROJECT_SOURCE_DIR}/src/public"
