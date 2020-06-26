@@ -33,6 +33,6 @@
 
 # CMake generated files
 build/
-
-# CMake generated executable binary files
 bin/
+lib/
+
