@@ -3,20 +3,20 @@
 
 #include "zinterface.h"
 
-namespace zcore {
+namespace core {
     
     class Core : public zif::iCore {
     public:
         virtual ~Core() {}
 
         virtual iModule * find_module(const std::string &__name);
-        virtual const char * get_env();
+        virtual const char * get_env() { return nullptr; }
 
         void parse_args(int __argc, const char **__argv);
         virtual const char * get_args(const char *__name);
 
         virtual void set_core_name(const char *__name) { core_name_ = __name; }
-        virtual const char * get_core_name() const { return core_name_.c_str(); }
+        virtual const char * get_core_name() { return core_name_.c_str(); }
 
         static Core *instance();
 

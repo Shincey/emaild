@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace zlib {
+namespace lib {
 
     // std::string base64_encode     (std::string const& s, bool url = false);
     // std::string base64_encode_pem (std::string const& s);

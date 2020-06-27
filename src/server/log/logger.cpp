@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 
-namespace zcore {
+namespace core {
 #define TIME_OUT_FOR_CUT_FILE 5*60*60*1000
 #define READ_COUNT 64
 
@@ -18,9 +18,10 @@ namespace zcore {
     }
 
     bool Logger::launch() {
-        set_sync_file_prefix(ztool::int64_to_str(ztool::zsystem::get_current_process_id()).c_str());
-        set_async_file_prefix(ztool::int64_to_str(ztool::zsystem::get_current_process_id()).c_str());
-        start();
+        s32 pid = tool::get_process_id();
+        set_sync_file_prefix(tool::int64_to_str(pid).c_str());
+        set_async_file_prefix(tool::int64_to_str(pid).c_str());
+        this->start();
         thread_status_ = STATUS_STARTING;
         return true;
     }
@@ -31,7 +32,7 @@ namespace zcore {
     }
 
     void Logger::log_sync(const s64 __tick, const char *__log, const bool __echo) {
-        std::string timestr = ztool::ztime::time(__tick);
+        std::string timestr = tool::time::time(__tick);
         sync_file_.write(timestr.c_str());
         sync_file_.write("|");
         sync_file_.write(__log);
@@ -63,7 +64,7 @@ namespace zcore {
         zassert(!sync_file_.is_open(), "sync log file has been craeted");
         if (!sync_file_.is_open()) {
             std::string name;
-            name.append(sync_prefix_).append("_").append(ztool::ztime::now("sync_%4d_%02d_%02d_%02d_%02d_%02d.log"));
+            name.append(sync_prefix_).append("_").append(tool::time::now("sync_%4d_%02d_%02d_%02d_%02d_%02d.log"));
             if (!sync_file_.open(path.c_str(), name.c_str())) {
                 zassert(false, "something wrong here");
                 printf("open log file : %s error \n", name.c_str());
@@ -79,11 +80,11 @@ namespace zcore {
         std::string path = "";
         path.append("/log/");
 
-        // ztool::file::mkdir(path.c_str());
+        // tool::file::mkdir(path.c_str());
         zassert(!async_file_.is_open(), "async log file has been created");
 
         std::string name;
-        name.append(async_prefix_.c_str()).append("_").append(ztool::ztime::now("async_%4d_%02d_%02d_%02d_%02d_%02d.log"));
+        name.append(async_prefix_.c_str()).append("_").append(tool::time::now("async_%4d_%02d_%02d_%02d_%02d_%02d.log"));
 
         if (!async_file_.open(path.c_str(), name.c_str())) {
             zassert(false, "something wrong here");
@@ -115,7 +116,7 @@ namespace zcore {
 
             if (!async_file_.is_open()) {
                 std::string name;
-                name.append(async_prefix_).append(ztool::ztime::now("async_%4d_%02d_%02d_%02d_%02d_%02d.log"));
+                name.append(async_prefix_).append(tool::time::now("async_%4d_%02d_%02d_%02d_%02d_%02d.log"));
 
                 std::string path = ""; //.......................................
                 path.append("/log/");
@@ -127,11 +128,11 @@ namespace zcore {
                 }
             }
 
-            s64 tick = ztool::ztime::milliseconds();
+            s64 tick = tool::time::milliseconds();
             if (tick - async_file_.get_open_tick() >= TIME_OUT_FOR_CUT_FILE) {
                 async_file_.close();
                 std::string name;
-                name.append(async_prefix_).append("_").append(ztool::ztime::now("async_%4d_%02d_%02d_%02d_%02d_%02d.log"));
+                name.append(async_prefix_).append("_").append(tool::time::now("async_%4d_%02d_%02d_%02d_%02d_%02d.log"));
                 std::string path = "";
                 path.append("/log/");
 
@@ -144,13 +145,13 @@ namespace zcore {
 
             s32 count = 0;
             while (queue_[read_index_].has_data && count++ <= read_count_) {
-                async_file_.write(ztool::ztime::time(queue_[read_index_].tick).c_str());
+                async_file_.write(tool::time::time(queue_[read_index_].tick).c_str());
                 async_file_.write("|");
                 async_file_.write(queue_[read_index_].log.c_str());
                 async_file_.write("\n");
 
                 if (queue_[read_index_].echo) {
-                    printf("%s|%s\n", ztool::ztime::time(queue_[read_index_].tick).c_str(), queue_[read_index_].log.c_str());
+                    printf("%s|%s\n", tool::time::time(queue_[read_index_].tick).c_str(), queue_[read_index_].log.c_str());
                 }
 
                 queue_[read_index_].clear();

@@ -1,6 +1,6 @@
 #include "zbase64.h"
 
-namespace zlib {
+namespace lib {
 
     const char* base64_chars[2] = {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

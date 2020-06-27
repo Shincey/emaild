@@ -3,7 +3,7 @@
 
 #include "zsystem.h"
 
-namespace zlib {
+namespace lib {
     enum {
         THREAD_STOPED = 0,
         THREAD_WORKING,

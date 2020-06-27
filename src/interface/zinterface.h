@@ -4,6 +4,7 @@
 
 #include "zsystem.h"
 #include <string>
+#include "ztools.h"
 
 class iModule;
 
@@ -183,7 +184,7 @@ namespace zif {
         virtual const char * get_args(const char *__name) = 0;
 
         virtual void set_core_name(const char *__name) = 0;
-        virtual const char * get_core_name();
+        virtual const char * get_core_name() = 0;
 
 
         virtual bool launch_udp_session(iUDPSession *__session, const char *__ip, const s32 __port) = 0;
@@ -203,6 +204,7 @@ namespace zif {
         virtual void set_sync_file_prefix(const char *__prefix) = 0;
         virtual void set_async_file_prefix(const char *__prefix) = 0;
     };
+
 }
 
 #ifdef DEBUG_MODE
@@ -215,21 +217,21 @@ namespace zif {
             char log[4096] = { 0 }; \
             snprintf(log, sizeof(log), "trace: %s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
             printf("%s\n", log); \
-            core->log_async(ztools::ztime::milliseconds(), log, false); \
+            core->log_async(tool::time::milliseconds(), log, false); \
         }
 
 #define error(core, format, ...) { \
         char log[4096] = { 0 }; \
         snprintf(log, sizeof(log), "error: %s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
         printf("%s\n", log); \
-        core->log_sync(ztools::ztime::milliseconds(), log, true); \
+        core->log_sync(tool::time::milliseconds(), log, true); \
         }
 
 #define imp(core, format, ...) { \
         char log[4096] = { 0 }; \
         snprintf(log, sizeof(log), "%s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
         printf("%s\n", log); \
-        core->log_sync(ztools::ztime::milliseconds(), log, true); \
+        core->log_sync(tool::time::milliseconds(), log, true); \
         }
 
 #else
@@ -238,20 +240,20 @@ namespace zif {
 #define trace(core, format, ...) { \
             char log[4096] = { 0 }; \
             snprintf(log, sizeof(log), "trace: %s : %d "#format, __FILE__, __LINE__, ##__VA_AR); \
-            core->log_async(ztools::ztime::milliseconds(), log, false); \
+            core->log_async(tool::time::milliseconds(), log, false); \
         }
 
 #define error(core, format, ...) { \
             char log[4096] = { 0 }; \
             zassert(false, format, ##__VA_ARGS__); \
             snprintf(log, sizeof(log), "error: %s : %d"#format, __FILE__, __LINE__, ##__VA_ARGS__); \
-            core->log_sync(ztools::ztime::milliseconds(), log, false); \
+            core->log_sync(tool::time::milliseconds(), log, false); \
         }
 
 #define imp(core, format, ...) { \
             char log[4096] = { 0 }; \
             snprintf(log, sizeof(log), "%s : %d "#format, __FILE__, __LINE__, ##__VA_ARGS__); \
-            core->log_sync(ztools::ztime::milliseconds(), log, false)
+            core->log_sync(tool::time::milliseconds(), log, false)
         }
 
 #endif // DEBUG_MODE
@@ -293,5 +295,6 @@ factory##name factory##name(s_iModules);
     extern "C" iModule *GetiModule() { \
         return s_iModules; \
     }
+
 
 #endif // __ZINTERFACE_H__

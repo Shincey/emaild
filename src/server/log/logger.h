@@ -8,8 +8,8 @@
 
 #define LOG_QUEUE_MAX_SIZE 10240
 
-namespace zcore {
-    class Logger : public zlib::zthread {
+namespace core {
+    class Logger : public lib::zthread {
         struct LogUnit {
             LogUnit() : tick(0), log(""), echo(false), has_data(false) {}
 

@@ -24,9 +24,11 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 #设置头文件目录
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/public"
                     "${PROJECT_SOURCE_DIR}/src/interface"
+                    "${PROJECT_SOURCE_DIR}/src/server"
                     "${PROJECT_SOURCE_DIR}/src/server/core"
                     "${PROJECT_SOURCE_DIR}/src/server/logic"
                     "${PROJECT_SOURCE_DIR}/src/server/log"
+                    "${PROJECT_SOURCE_DIR}/src/server/udp"
 )
 
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/public)

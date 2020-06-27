@@ -1,6 +1,6 @@
 #include "logic.h"
 
-namespace zcore {
+namespace core {
     Logic * Logic::instance() {
         static Logic *s_logic = nullptr;
         if (nullptr == s_logic) { 
@@ -9,10 +9,12 @@ namespace zcore {
         }
         return s_logic;
     }
-
-    bool Logic::launch() { return false; }
+    // 导入需要的资源
+    bool Logic::launch() { return true; }
 
     void Logic::process(const s32 __overtime) {}
+
+    // 释放资源
     void Logic::shutdown() {}
 
     iModule * Logic::find_module(const char *__name) { return nullptr; }

@@ -1,7 +1,7 @@
 #include "logfile.h"
 #include "ztools.h"
 
-namespace zcore {
+namespace core {
     bool LogFile::open(const char *__path, const char *__name) {
         if (file_) { return false; }
         std::string filepath;
@@ -10,7 +10,7 @@ namespace zcore {
 
         file_ = ::fopen(filepath.c_str(), "ab+");
         if (nullptr == file_) { return false; }
-        open_tick_ = ztool::ztime::milliseconds();
+        open_tick_ = tool::time::milliseconds();
         return true;
     }
 

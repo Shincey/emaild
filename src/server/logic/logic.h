@@ -3,7 +3,7 @@
 
 #include "zinterface.h"
 
-namespace zcore {
+namespace core {
     class Logic {
     public:
         static Logic * instance();

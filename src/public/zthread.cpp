@@ -3,7 +3,7 @@
 #include <pthread.h>
 
 
-namespace zlib {
+namespace lib {
 
     static void* thread_proc(void *__param) {
         zthread *ptr = reinterpret_cast<zthread *>(__param);

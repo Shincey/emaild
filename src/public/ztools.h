@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-namespace ztool {
+namespace tool {
 
-    namespace zmemery {
+    namespace mem {
         inline void s_memset(void *__restrict __dest, size_t __max, int __val, size_t __n) {
             zassert(__n <= __max, "over flow");
             memset(__dest, __val, (__max >= __n) ? (__n) : (__max));
@@ -30,15 +30,13 @@ namespace ztool {
         }
     }
 
-    namespace zsystem {
-        s32 get_current_process_id();
-    }
+    s32 get_process_id();
 
-    namespace ztime {
+    namespace time {
         inline bool s_localtime(struct tm &__ts, const time_t &__tt) {
             const struct tm *pt = localtime(&__tt);
             if (nullptr == pt) { return false; }
-            zmemery::s_memcpy(&__ts, sizeof(__ts), pt, sizeof(__ts));
+            mem::s_memcpy(&__ts, sizeof(__ts), pt, sizeof(__ts));
             return true;
         }
 
@@ -89,8 +87,12 @@ namespace ztool {
         }
     }
 
-    namespace zfile {
+    namespace file {
         const char* get_app_path();
+        bool exists(const char *__path);
+        bool mkdir(const char *__path);
+        bool rmdir(const char *__path);
+        bool rmfile(const char *__path);
     }
 
     template <typename T>
@@ -157,7 +159,7 @@ namespace ztool {
 
     inline s32 rand(s32 __range) {
         if (0 == __range) { return 0; }
-        static u64 s_seed = ztime::milliseconds();
+        static u64 s_seed = time::milliseconds();
         s_seed = (((s_seed = s_seed * 214013L + 2531011L) >> 16) & 0x7fff);
         return s_seed % __range;
     }
@@ -168,17 +170,17 @@ namespace ztool {
     }
 
     inline std::string& operator<<(std::string &__target, const s32 __val) {
-        __target += ztool::int_to_str(__val);
+        __target += tool::int_to_str(__val);
         return __target;
     }
 
     inline std::string& operator<<(std::string &__target, const s64 __val) {
-        __target += ztool::int64_to_str(__val);
+        __target += tool::int64_to_str(__val);
         return __target;
     }
 
     inline std::string& operator<<(std::string &__target, const double __val) {
-        __target += ztool::float_to_str(__val);
+        __target += tool::float_to_str(__val);
         return __target;
     }
 

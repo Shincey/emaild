@@ -3,7 +3,7 @@
 
 #include "ztools.h"
 
-namespace zlib {
+namespace lib {
 
     template <typename __T, s32 __list_nums__ = 1, s32 __chunk_nums__ = 64>
     class zpool {

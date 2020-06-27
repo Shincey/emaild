@@ -3,7 +3,7 @@
 
 #include "zsystem.h"
 
-namespace zcore {
+namespace core {
     class LogFile {
     public:
 
