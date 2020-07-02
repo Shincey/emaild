@@ -6,11 +6,12 @@
 namespace lib {
 
     static void* thread_proc(void *__param) {
-        zthread *ptr = reinterpret_cast<zthread *>(__param);
+        zthread *ptr = static_cast<zthread *>(__param);
         zassert(ptr, "the pointer to zthread is null");
         ptr->run();
         return ptr;
     }
+
 
     bool zthread::start(s32 __threads) {
         for (s32 i = 0; i < __threads; i++) {

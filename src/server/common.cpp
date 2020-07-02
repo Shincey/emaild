@@ -9,6 +9,10 @@ namespace core {
     lib::zpool<zAssociate> g_associate_pool;
     Core *g_core = nullptr;
 
+    iNet * net_instance() {
+        return Epoller::instance();
+    }
+
     Epoller * Epoller::instance() {
         static Epoller *s_epoller = nullptr;
         if (nullptr == s_epoller) {

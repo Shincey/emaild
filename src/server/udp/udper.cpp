@@ -57,10 +57,11 @@ namespace core {
 
     void UDPer::cache() {}
     void UDPer::load() {}
+
     void UDPer::close() {
         if (-1 != socket_) {
             ::close(socket_);
-            socket_ = -1;
+            //socket_ = -1;                    // need to be considered
             epoll_ctl(g_epoller_fd, EPOLL_CTL_DEL, socket_, 0);
             tool::mem::s_memset((void *)&session_->pipe_, sizeof(void *), 0, sizeof(void *));
             session_->on_close(Core::instance());

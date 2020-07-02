@@ -205,6 +205,17 @@ namespace zif {
         virtual void set_async_file_prefix(const char *__prefix) = 0;
     };
 
+    class iThread {
+    public:
+        typedef void * (* ThreadCallBack)(void *);
+
+        virtual ~iThread() {}
+
+        virtual bool start(s32 __threads=1) = 0;
+        virtual void run() = 0;
+        virtual void terminate() = 0;
+    };
+
 }
 
 #ifdef DEBUG_MODE

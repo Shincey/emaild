@@ -4,12 +4,12 @@
 #include <string>
 
 #include "logfile.h"
-#include "zthread.h"
+#include "zinterface.h"
 
 #define LOG_QUEUE_MAX_SIZE 10240
 
 namespace core {
-    class Logger : public lib::zthread {
+    class Logger : public zif::iThread {
         struct LogUnit {
             LogUnit() : tick(0), log(""), echo(false), has_data(false) {}
 
@@ -38,6 +38,8 @@ namespace core {
         virtual void set_sync_file_prefix(const char *__prefix);
         virtual void set_async_file_prefix(const char *__prefix);
 
+
+        virtual bool start(s32 __threads=1);
         virtual void terminate();
         virtual void run();
 

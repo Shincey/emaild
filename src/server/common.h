@@ -84,10 +84,6 @@ namespace core {
         virtual bool launch_tcp_server(zif::iTCPServer *__server, const char *__ip, const s32 __port, int __max_ss, int __max_rs);
         virtual void deal();
     };
-
-    iNet * net_instance() {
-        return Epoller::instance();
-    }
 }
 
 #ifdef __cplusplus

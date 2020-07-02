@@ -18,10 +18,10 @@ namespace core {
     }
 
     bool Logger::launch() {
-        s32 pid = tool::get_process_id();
+        s32 pid = getpid(); //tool::get_process_id();
         set_sync_file_prefix(tool::int64_to_str(pid).c_str());
         set_async_file_prefix(tool::int64_to_str(pid).c_str());
-        this->start();
+        start();
         thread_status_ = STATUS_STARTING;
         return true;
     }
@@ -91,6 +91,26 @@ namespace core {
             printf("open log file : %s error \n", name.c_str());
         }
     }
+
+    bool Logger::start(s32 __threads) {
+        ThreadCallBack callback = [](void *__param) -> void* {
+            zif::iThread *ptr = static_cast<zif::iThread *>(__param);
+            zassert(ptr, "the pointer to zthread is null");
+            ptr->run();
+            return ptr;
+        };
+        for (int i = 0; i < __threads; ++i) {
+            pthread_t tid = 0;
+            int ret = pthread_create(&tid, nullptr, callback, (void *)this);
+            if (ret != 0) {
+                return false;
+            } else {
+
+            }
+        }
+        return true;
+    }
+
 
     void Logger::terminate() {
         zassert(thread_status_ == STATUS_STARTING, "wrong thread status");

@@ -12,6 +12,9 @@
 
 #include "common.h"
 
+#include "logger.h"
+#include "zthread.h"
+
 
 int main (int argc, const char **argv, const char **env) {
     // struct utsname uts;
@@ -54,18 +57,20 @@ int main (int argc, const char **argv, const char **env) {
     // }
 
     
-    core::Core::instance()->parse_args(argc, argv);
-    if (core::Core::instance()->get_args("pause")) {
-        getchar();
-    }
+    // core::Core::instance()->parse_args(argc, argv);
+    // if (core::Core::instance()->get_args("pause")) {
+    //     getchar();
+    // }
 
-    const char *name = core::Core::instance()->get_args("name");
-    if (name) { core::Core::instance()->set_core_name(name); }
-    else { core::Core::instance()->set_core_name("test"); }
+    // const char *name = core::Core::instance()->get_args("name");
+    // if (name) { core::Core::instance()->set_core_name(name); }
+    // else { core::Core::instance()->set_core_name("test"); }
     core::Core::instance()->launch();
     while(true) {
         core::Core::instance()->loop();
     }
+
+
 
     exit(EXIT_SUCCESS);
 }
