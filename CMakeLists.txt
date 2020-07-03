@@ -29,6 +29,7 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/public"
                     "${PROJECT_SOURCE_DIR}/src/server/logic"
                     "${PROJECT_SOURCE_DIR}/src/server/log"
                     "${PROJECT_SOURCE_DIR}/src/server/udp"
+                    "${PROJECT_SOURCE_DIR}/src/server/tcp"
 )
 
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/public)

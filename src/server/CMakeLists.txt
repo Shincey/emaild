@@ -14,6 +14,8 @@ SET(server
     "${PROJECT_SOURCE_DIR}/src/server/log/logfile.cpp"
     "${PROJECT_SOURCE_DIR}/src/server/udp/udper.h"
     "${PROJECT_SOURCE_DIR}/src/server/udp/udper.cpp"
+    "${PROJECT_SOURCE_DIR}/src/server/tcp/tcper.h"
+    "${PROJECT_SOURCE_DIR}/src/server/tcp/tcper.cpp"
 )
 
 ADD_LIBRARY(LIB_SERVER STATIC ${server})

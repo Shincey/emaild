@@ -10,10 +10,10 @@ class iModule;
 
 namespace zif {
     struct zAddress {
-        std::string ip_;
-        s32 port_;
-        zAddress() : ip_(""), port_(0) {}
-        zAddress(const std::string &__ip, const s32 __port) : ip_(__ip), port_(__port) {}
+        std::string ip;
+        s32 port;
+        zAddress() : ip(""), port(0) {}
+        zAddress(const std::string &__ip, const s32 __port) : ip(__ip), port(__port) {}
     };
 
     class iCore;
@@ -41,7 +41,7 @@ namespace zif {
     class iSocket {
     public:
         virtual ~iSocket() {}
-        zAddress addr_;
+        zAddress address_;
     };
 
     class iUDPSocket : public iSocket {
@@ -81,7 +81,7 @@ namespace zif {
     class iAccepter {
     public:
         virtual ~iAccepter() {}
-        virtual void relearse() = 0;
+        virtual void release() = 0;
     };
 
     class iTCPSession : public iTCPSocket {
@@ -119,7 +119,7 @@ namespace zif {
 
         virtual iUDPSession * on_malloc_connection(iCore *__core, const char *__ip, const s32 __port) = 0;
         virtual void on_release(iCore *__core) = 0;
-        virtual void close() { ac_->relearse(); }
+        virtual void close() { ac_->release(); }
 
         iAccepter *ac_;
     };
@@ -132,7 +132,7 @@ namespace zif {
         virtual iTCPSession * on_malloc_connection(iCore *__core, const char *__remote_ip, const s32 __remote_port) = 0;
         virtual void on_error(iCore *__core, iTCPSession *__session) = 0;
         virtual void on_relear(iCore *__core) = 0;
-        virtual void close() { ac_->relearse(); }
+        virtual void close() { ac_->release(); }
         iAccepter *ac_;
     };
 

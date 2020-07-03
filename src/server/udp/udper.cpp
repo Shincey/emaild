@@ -86,8 +86,8 @@ namespace core {
             struct sockaddr_in addr;
             bzero(&addr, sizeof(addr));
             addr.sin_family = AF_INET;
-            addr.sin_port = htons(addr_.port_);
-            inet_pton(AF_INET, addr_.ip_.c_str(), &addr.sin_addr.s_addr);
+            addr.sin_port = htons(addr_.port);
+            inet_pton(AF_INET, addr_.ip.c_str(), &addr.sin_addr.s_addr);
             s32 addr_len = sizeof(addr);
             s32 len = ::recvfrom(socket_, recv_temp_, sizeof(recv_temp_), 0, (struct sockaddr *)&addr, (socklen_t *)addr_len);
             if (len > 0) {

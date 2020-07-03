@@ -13,11 +13,12 @@
 
 #include <sys/epoll.h>
 #include <sys/socket.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
-#include <sys/epoll.h>
+#include <netinet/tcp.h>
 
 #include "zinterface.h"
 #include "zpool.h"
@@ -89,7 +90,7 @@ namespace core {
 #ifdef __cplusplus
 extern "C" {
 #endif
-    inline int setnonblocking(int sockfd) {
+    inline s32 setnonblocking(int sockfd) {
         return fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL, 0) | O_NONBLOCK);
     }
 
@@ -98,12 +99,43 @@ extern "C" {
         return setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&val, sizeof(val));
     }
 
-    inline int setsocksendbuff(int sockfd, int size) {
+    inline s32 settcpnodelay(const s32 fd) {
+        int val = 1l;
+        return setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (const char *)&val, sizeof(val));
+    }
+
+    inline s32 settcpquickack(const s32 fd) {
+        int val = 1l;
+        return setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, (const char *)&val, sizeof(val));
+    }
+
+    inline s32 setsocksendbuff(int sockfd, int size) {
         return setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, (const char *)&size, sizeof(size));
     }
 
-    inline int setsockrecvbuff(int sockfd, int size) {
+    inline s32 setsockrecvbuff(int sockfd, int size) {
         return setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, (const char *)&size, sizeof(size));
+    }
+
+    inline s32 setmaxopenfiles(const s32 size) {
+        struct rlimit rt;
+        rt.rlim_max = rt.rlim_cur = size;
+        if (-1 == setrlimit(RLIMIT_NOFILE, &rt)) return -1;
+        return 0;
+    }
+
+    inline s32 setstacksize(const s32 size) {
+        struct rlimit rt;
+        rt.rlim_max = rt.rlim_cur = size * 1024;
+        if (-1 == setrlimit(RLIMIT_STACK, &rt)) return  -1;
+        return 0;
+    }
+
+    inline bool get_ip_by_host(const char *__host, std::string &__ip) {
+        struct hostent *hp;
+        if ((hp = gethostbyname(__host)) == NULL) return false;
+        __ip = inet_ntoa(*(struct in_addr*)hp->h_addr);
+        return true;
     }
 
 #ifdef __cplusplus

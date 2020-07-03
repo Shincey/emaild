@@ -6,7 +6,6 @@
 
 namespace core {
     s32 g_epoller_fd = -1;
-    lib::zpool<zAssociate> g_associate_pool;
     Core *g_core = nullptr;
 
     iNet * net_instance() {
