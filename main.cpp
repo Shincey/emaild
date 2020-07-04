@@ -56,21 +56,54 @@ int main (int argc, const char **argv, const char **env) {
     //     recover_to_pool(_pool, p);
     // }
 
-    
-    // core::Core::instance()->parse_args(argc, argv);
-    // if (core::Core::instance()->get_args("pause")) {
-    //     getchar();
-    // }
+    class TCPSession : public zif:: iTCPSession {
+    public:
+        virtual int on_recv(zif::iCore *__core, const void *__content, const int __size) {
+            char tmp[1024];
+            snprintf(tmp, __size, "%s", __content);
+            printf("on_recv: %s \n -------------------------------------------------------", tmp);
+        }
+        virtual void on_connect(zif::iCore *__core) {
+            printf("on_connect\n ----------------------------------------------------------------");
+        }
+        virtual void on_disconnect(zif::iCore *__core) {
+            printf("on_disconnect\n ----------------------------------------------------------------");
+        }
+        virtual void on_connect_failed(zif::iCore *__core) {
+            printf("on_connect_failed\n ----------------------------------------------------------------");
+        }
+    };
 
-    // const char *name = core::Core::instance()->get_args("name");
-    // if (name) { core::Core::instance()->set_core_name(name); }
-    // else { core::Core::instance()->set_core_name("test"); }
-    core::Core::instance()->launch();
-    while(true) {
-        core::Core::instance()->loop();
+    class TCPServer : public zif::iTCPServer {
+    public:
+        virtual zif::iTCPSession * on_malloc_connection(zif::iCore *__core, const char *__remote_ip, const s32 __remote_port) {
+            return new TCPSession;
+        }
+        virtual void on_error(zif::iCore *__core, zif::iTCPSession *__session) {
+            printf("on_error\n ----------------------------------------------------------");
+        }
+        virtual void on_release(zif::iCore *__core) {
+            printf("on_release\n -----------------------------------------------------------");
+        }
+    };
+    
+    core::Core::instance()->parse_args(argc, argv);
+    if (core::Core::instance()->get_args("pause")) {
+        getchar();
     }
 
+    const char *name = core::Core::instance()->get_args("name");
+    if (name) { core::Core::instance()->set_core_name(name); }
+    else { core::Core::instance()->set_core_name("test"); }
 
+    core::Core::instance()->launch();
 
+    zif::iTCPServer *tcpsvr = new TCPServer;
+    core::Core::instance()->launch_tcp_server(tcpsvr, "127.0.0.1", 3200, 1024, 1024);
+
+    while (true) {
+        core::Core::instance()->loop();
+    }
+    
     exit(EXIT_SUCCESS);
 }

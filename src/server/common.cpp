@@ -1,5 +1,6 @@
 #include "common.h"
 #include "udper.h"
+#include "tcper.h"
 
 #define EPOLLER_DESC_COUNT 10240
 #define EPOLLER_EVS_MAX_COUNT 512
@@ -40,11 +41,13 @@ namespace core {
     }
 
     bool Epoller::launch_tcp_session(zif::iTCPSession *__session, const char *__ip, const s32 __port, int __max_ss, int __max_rs) {
-        return false;
+        TCPer *tcp = TCPer::create(__session, __ip, __port, __max_ss, __max_rs);
+        return tcp != nullptr;
     }
 
     bool Epoller::launch_tcp_server(zif::iTCPServer *__server, const char *__ip, const s32 __port, int __max_ss, int __max_rs) {
-        return false;
+        Accepter *accepter = Accepter::create(__server, __ip, __port, __max_ss, __max_rs);
+        return accepter != nullptr;
     }
 
     void Epoller::deal() {

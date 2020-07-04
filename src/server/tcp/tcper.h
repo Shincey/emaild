@@ -3,6 +3,7 @@
 
 #include "zinterface.h"
 #include "common.h"
+#include "zbuffer.h"
 
 namespace core {
     class Accepter : public zif::iAccepter, public core::iCompleter {
@@ -26,8 +27,12 @@ namespace core {
         zif::zAddress address_;
         s32 socket_;
         sockaddr_in addr_in_;
-        zAssociate at_;
+        zAssociate associate_;
     };
+
+
+
+    
 
     class TCPer : public iCompleter, public zif::iTCPPipe {
     public:
@@ -44,9 +49,15 @@ namespace core {
         virtual void send(const void *__data, const s32 __size, bool __immediately);
 
     private:
+        friend void case_connect(TCPer *__tcp, zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev);
+        friend void case_io(TCPer *__tcp, zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev);
+
+    private:
+        TCPer(zif::iTCPSession *__session, const std::string &__ip, const s32 __port, const s32 __ssize, const s32 __rsize);
+
+    private:
         friend Accepter;
         friend lib::zpool<TCPer>;
-        TCPer(zif::iTCPSession *__session, const std::string &__ip, const s32 __port, const s32 __ssize, const s32 __rsize);
 
     private:
         bool connected_;
@@ -55,6 +66,9 @@ namespace core {
         const zAssociate associate_;
         const zif::zAddress peer_address_;
         zif::iTCPSession * const session_;
+
+        lib::zbuffer send_buff_;
+        lib::zbuffer recv_buff_;
     };
 }
 

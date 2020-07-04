@@ -114,26 +114,26 @@ namespace zif {
 
     class iUDPServer {
     public:
-        iUDPServer() : ac_(nullptr) {}
+        iUDPServer() : accepter_(nullptr) {}
         virtual ~iUDPServer() {}
 
         virtual iUDPSession * on_malloc_connection(iCore *__core, const char *__ip, const s32 __port) = 0;
         virtual void on_release(iCore *__core) = 0;
-        virtual void close() { ac_->release(); }
+        virtual void close() { accepter_->release(); }
 
-        iAccepter *ac_;
+        iAccepter *accepter_;
     };
 
     class iTCPServer {
     public:
-        iTCPServer() : ac_(nullptr) {}
+        iTCPServer() : accepter_(nullptr) {}
         virtual ~iTCPServer() {}
 
         virtual iTCPSession * on_malloc_connection(iCore *__core, const char *__remote_ip, const s32 __remote_port) = 0;
         virtual void on_error(iCore *__core, iTCPSession *__session) = 0;
-        virtual void on_relear(iCore *__core) = 0;
-        virtual void close() { ac_->release(); }
-        iAccepter *ac_;
+        virtual void on_release(iCore *__core) = 0;
+        virtual void close() { accepter_->release(); }
+        iAccepter *accepter_;
     };
 
     class iUDPBoradcaster {

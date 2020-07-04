@@ -43,6 +43,7 @@ namespace core {
 
 
     bool Core::launch() {
+        // 读取配置表，更改信息
         return true;
     }
 
