@@ -60,18 +60,18 @@ int main (int argc, const char **argv, const char **env) {
     public:
         virtual int on_recv(zif::iCore *__core, const void *__content, const int __size) {
             char tmp[1024];
-            snprintf(tmp, __size, "%s", __content);
-            printf("on_recv: %s \n -------------------------------------------------------", tmp);
+            snprintf(tmp, __size, "%s", (const char *)__content);
+            printf("on_recv: %s\n", tmp);
             return __size;
         }
         virtual void on_connect(zif::iCore *__core) {
             printf("on_connect hello world\n");
         }
         virtual void on_disconnect(zif::iCore *__core) {
-            printf("on_disconnect\n ----------------------------------------------------------------");
+            printf("on_disconnect\n");
         }
         virtual void on_connect_failed(zif::iCore *__core) {
-            printf("on_connect_failed\n ----------------------------------------------------------------");
+            printf("on_connect_failed\n");
         }
     };
 
@@ -81,10 +81,10 @@ int main (int argc, const char **argv, const char **env) {
             return new TCPSession;
         }
         virtual void on_error(zif::iCore *__core, zif::iTCPSession *__session) {
-            printf("on_error\n ----------------------------------------------------------");
+            printf("on_error\n");
         }
         virtual void on_release(zif::iCore *__core) {
-            printf("on_release\n -----------------------------------------------------------");
+            printf("on_release\n");
         }
     };
     

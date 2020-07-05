@@ -84,6 +84,7 @@ namespace core {
 
                     TCPer *tcp = create_from_pool(g_tcper_pool, session, ip, port, ssize_, rsize_);
                     struct epoll_event ev;
+                    ev.data.ptr = (void *)&tcp->association_;
                     ev.events = EPOLLIN;
                     if (-1 == epoll_ctl(g_epoller_fd, EPOLL_CTL_ADD, sockfd, &ev)) {
                         server_->on_error(Core::instance(), session);
@@ -141,8 +142,8 @@ namespace core {
     }
 
     TCPer * TCPer::create(zif::iTCPSession *__session, const std::string &__host, const s32 __port, s32 __ssize, s32 __rsize) {
-        (__ssize <= MAX_PIPE_SIZE) ? : (__ssize = MAX_PIPE_SIZE);
-        (__rsize <= MAX_PIPE_SIZE) ? : (__rsize <= MAX_PIPE_SIZE);
+        (__ssize <= MAX_PIPE_SIZE) ? 0 : (__ssize = MAX_PIPE_SIZE);
+        (__rsize <= MAX_PIPE_SIZE) ? 0 : (__rsize = MAX_PIPE_SIZE);
 
         const s32 host_len = __host.size() + 1;
         char *tmp = (char *)alloca(host_len);
@@ -160,7 +161,7 @@ namespace core {
         __session->address_.ip = ip;
         __session->address_.port = __port;
 
-        struct timeval tv;
+        //struct timeval tv;
         struct sockaddr_in addr;
         bzero(&addr, sizeof(struct sockaddr_in));
         addr.sin_family = AF_INET;
@@ -339,6 +340,9 @@ namespace core {
             }
             case eEpollEventType::IO: {
                 case_io(this, __association, __type, __ev);
+                break;
+            }
+            default: {
                 break;
             }
         }
