@@ -59,8 +59,8 @@ namespace core {
             if (count = epoll_wait(g_epoller_fd, evs, EPOLLER_EVS_MAX_COUNT, 1); 0 == count) { return; }
             if (-1 == count) { return; }
             for (s32 i = 0; i < count; ++i) {
-                struct zAssociate *ac = (struct zAssociate *)evs[i].data.ptr;
-                ac->cpr->on_completer(ac, ac->cpn, evs[i]);
+                struct sAssociation *association = (struct sAssociation *)evs[i].data.ptr;
+                association->event_handler->on_epoll_event(association, association->type, evs[i]);
             }
         } while (tool::time::microseconds() - tick < 1000);
     }

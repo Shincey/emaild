@@ -18,7 +18,7 @@
 #define PACKAGE_MAX_SIZE 512
 
 namespace core {
-    class UDPer : public zif::iUDPPipe, public iCompleter {
+    class UDPer : public zif::iUDPPipe, public iEpollEvent {
     public:
         virtual ~UDPer() {}
 
@@ -28,7 +28,7 @@ namespace core {
         virtual void close();
 
         virtual void sendto(const char *__ip, const s32 __port, const void *__content, const s32 __size);
-        virtual void on_completer(zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev);
+        virtual void on_epoll_event(sAssociation *__association, const eEpollEventType __type, const struct epoll_event &__ev);
 
         inline u32 get_socket() { return socket_; }
 
@@ -41,15 +41,13 @@ namespace core {
         bool async_send();
 
     private:
-        char recv_temp_[PACKAGE_MAX_SIZE];
-        std::queue<zPackage> send_queue_;
-        zif::zAddress addr_;
-
         zif::iUDPSession *session_;
-        u32 socket_;
-
-        zAssociate associate_;
+        s32 socket_;
         bool is_cache_;
+        sAssociation association_;
+        zif::sAddress addr_;
+        char recv_temp_[PACKAGE_MAX_SIZE];
+        std::queue<sPackage> send_queue_;
     };
 }
 

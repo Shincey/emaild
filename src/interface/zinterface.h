@@ -9,11 +9,11 @@
 class iModule;
 
 namespace zif {
-    struct zAddress {
+    struct sAddress {
         std::string ip;
         s32 port;
-        zAddress() : ip(""), port(0) {}
-        zAddress(const std::string &__ip, const s32 __port) : ip(__ip), port(__port) {}
+        sAddress() : ip(""), port(0) {}
+        sAddress(const std::string &__ip, const s32 __port) : ip(__ip), port(__port) {}
     };
 
     class iCore;
@@ -41,7 +41,7 @@ namespace zif {
     class iSocket {
     public:
         virtual ~iSocket() {}
-        zAddress address_;
+        sAddress address_;
     };
 
     class iUDPSocket : public iSocket {

@@ -29,36 +29,36 @@ namespace core {
     extern core::Core *g_core;
     extern s32 g_epoller_fd;
 
-    enum eCompletion {
+    enum eEpollEventType {
         Accept,
         Connect,
         IO,
     };
 
-    class iCompleter;
-    struct zAssociate {
-        const eCompletion cpn;
-        iCompleter * const cpr;
-        zAssociate(const eCompletion __cpn, iCompleter * const __cpr) : cpn(__cpn), cpr(__cpr) {}
+    class iEpollEvent;
+    struct sAssociation {
+        const eEpollEventType type;
+        iEpollEvent * const event_handler;
+        sAssociation(const eEpollEventType __type, iEpollEvent * const __event) : type(__type), event_handler(__event) {}
     };
 
-    class iCompleter {
+    class iEpollEvent {
     public:
-        virtual ~iCompleter() {}
+        virtual ~iEpollEvent() {}
 
-        virtual void on_completer(zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev) = 0;
+        virtual void on_epoll_event(sAssociation *__association, const eEpollEventType __type, const struct epoll_event &__ev) = 0;
     };
 
-    struct zPackage {
+    struct sPackage {
         void * const data;
         const s32 len;
         const std::string ip;
         const s32 port;
 
-        zPackage(const void *__data, const s32 __len, const std::string &__ip, const s32 __port) : data(new char[__len]), len(__len), ip(__ip), port(__port) {
+        sPackage(const void *__data, const s32 __len, const std::string &__ip, const s32 __port) : data(new char[__len]), len(__len), ip(__ip), port(__port) {
             tool::mem::s_memcpy(data, len, __data, __len);
         }
-        zPackage(const zPackage &__package) : data(__package.data), len(__package.len), ip(__package.ip), port(__package.port) {}
+        sPackage(const sPackage &__package) : data(__package.data), len(__package.len), ip(__package.ip), port(__package.port) {}
     };
 
 

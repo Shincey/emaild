@@ -7,19 +7,19 @@ namespace core {
 
     lib::zpool<Accepter> g_accerpter_pool;
     lib::zpool<TCPer> g_tcper_pool;
-    lib::zpool<zAssociate> g_associate_pool;
+    lib::zpool<sAssociation> g_associate_pool;
 
 
     Accepter::Accepter(zif::iTCPServer * __server, const char *__ip, const s32 __port, s32 __ssize, s32 __rsize)
     : server_(__server), socket_(-1), address_(__ip, __port), ssize_(__ssize <= MAX_PIPE_SIZE ? __ssize : MAX_PIPE_SIZE),
-      rsize_(__rsize <= MAX_PIPE_SIZE ? __rsize : MAX_PIPE_SIZE), associate_(eCompletion::Accept, this)
+      rsize_(__rsize <= MAX_PIPE_SIZE ? __rsize : MAX_PIPE_SIZE), association_(eEpollEventType::Accept, this)
     {
 
     }
 
     Accepter * Accepter::create(zif::iTCPServer * __server, const char *__ip, const s32 __port, s32 __ssize, s32 __rsize) {
         zassert(__server, "something wrong with server");
-        struct timeval tv;
+        //struct timeval tv;
         struct sockaddr_in addr;
         bzero(&addr, sizeof(addr));
         addr.sin_family = AF_INET;
@@ -40,7 +40,7 @@ namespace core {
         Accepter *ac = create_from_pool(g_accerpter_pool, __server, __ip, __port, __ssize, __rsize);
         ac->socket_ = sockfd;
         epoll_event ev;
-        ev.data.ptr = (void *)&ac->associate_;
+        ev.data.ptr = (void *)&ac->association_;
         ev.events = EPOLLIN;
         
         if (-1 == epoll_ctl(g_epoller_fd, EPOLL_CTL_ADD, sockfd, &ev)) {
@@ -51,8 +51,8 @@ namespace core {
         return ac;
     }
 
-    void Accepter::on_completer(zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev) {
-        zassert(eCompletion::Accept == __type, "Accepter on Completer error");
+    void Accepter::on_epoll_event(sAssociation *__association, const eEpollEventType __type, const struct epoll_event &__ev) {
+        zassert(eEpollEventType::Accept == __type, "Accepter on Completer error");
         if (__ev.events & EPOLLIN) {
             struct sockaddr_in addr_in;
             socklen_t len = sizeof(addr_in);
@@ -135,7 +135,7 @@ namespace core {
     TCPer::TCPer(zif::iTCPSession *__session, const std::string &__ip, const s32 __port, const s32 __ssize, const s32 __rsize)
         :session_(__session), peer_address_(__ip, __port),
          connected_(false), caching_(false),
-         associate_(eCompletion::IO, this), socket_(-1),
+         association_(eEpollEventType::IO, this), socket_(-1),
          send_buff_(__ssize), recv_buff_(__ssize)
     {
     }
@@ -181,7 +181,7 @@ namespace core {
         tcp->socket_ = sockfd;
         if (s32 ret = ::connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)); ret == 0) {
             struct epoll_event ev;
-            ev.data.ptr = (void *)&tcp->associate_;
+            ev.data.ptr = (void *)&tcp->association_;
             ev.events = EPOLLIN;
             if (-1 == epoll_ctl(g_epoller_fd, EPOLL_CTL_ADD, sockfd, &ev)) {
                 __session->on_connect_failed(Core::instance());
@@ -200,7 +200,7 @@ namespace core {
             recover_to_pool(g_tcper_pool, tcp);
             return nullptr;
         } else {
-            zAssociate * associate = create_from_pool(g_associate_pool, eCompletion::Connect, tcp);
+            sAssociation * associate = create_from_pool(g_associate_pool, eEpollEventType::Connect, tcp);
             struct epoll_event ev;
             ev.data.ptr = (void *)associate;
             ev.events = EPOLLOUT;
@@ -216,7 +216,7 @@ namespace core {
         return tcp;
     }
 
-    void case_connect(TCPer *__tcp, zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev) {
+    void case_connect(TCPer *__tcp, sAssociation *__association, const eEpollEventType __type, const struct epoll_event &__ev) {
         auto close_session = [&] () {
             ::close(__tcp->socket_);
             __tcp->socket_ = -1;
@@ -224,7 +224,7 @@ namespace core {
             recover_to_pool(g_tcper_pool, __tcp);
         };
 
-        recover_to_pool(g_associate_pool, __ac);
+        recover_to_pool(g_associate_pool, __association);
         if (-1 == settcpnodelay(__tcp->socket_)) {
             close_session();
             return;
@@ -238,7 +238,7 @@ namespace core {
 
         if (__ev.events & EPOLLOUT) {
             struct epoll_event ev;
-            ev.data.ptr = (void *)&__tcp->associate_;
+            ev.data.ptr = (void *)&__tcp->association_;
             ev.events = EPOLLIN;
             if (-1 == epoll_ctl(g_epoller_fd, EPOLL_CTL_ADD, __tcp->socket_, &ev)) {
                 close_session();
@@ -254,7 +254,7 @@ namespace core {
         }
     }
 
-    void case_io(TCPer *__tcp, zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev) {
+    void case_io(TCPer *__tcp, sAssociation *__association, const eEpollEventType __type, const struct epoll_event &__ev) {
         auto error_handler = [&] () {
             zassert(__tcp, "tcp is null");
             if (!__tcp) return;
@@ -313,7 +313,7 @@ namespace core {
                     __tcp->send_buff_.out(len);
                     if (__tcp->send_buff_.length() == 0) {
                         struct epoll_event ev;
-                        ev.data.ptr = (void *)&__tcp->associate_;
+                        ev.data.ptr = (void *)&__tcp->association_;
                         ev.events = EPOLLIN;
                         if (-1 == epoll_ctl(g_epoller_fd, EPOLL_CTL_MOD, __tcp->socket_, &ev)) {
                             epoll_ctl(g_epoller_fd, EPOLL_CTL_DEL, __tcp->socket_, nullptr);
@@ -331,14 +331,14 @@ namespace core {
 
 
 
-    void TCPer::on_completer(zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev) {
+    void TCPer::on_epoll_event(sAssociation *__association, const eEpollEventType __type, const struct epoll_event &__ev) {
         switch (__type) {
-            case eCompletion::Connect: {
-                case_connect(this, __ac, __type, __ev);
+            case eEpollEventType::Connect: {
+                case_connect(this, __association, __type, __ev);
                 break;
             }
-            case eCompletion::IO: {
-                case_io(this, __ac, __type, __ev);
+            case eEpollEventType::IO: {
+                case_io(this, __association, __type, __ev);
                 break;
             }
         }
@@ -373,7 +373,7 @@ namespace core {
         if (send_buff_.in(__data, __size)) {
             if (__immediately) {
                 struct epoll_event ev;
-                ev.data.ptr = (void *)&associate_;
+                ev.data.ptr = (void *)&association_;
                 ev.events = EPOLLIN | EPOLLOUT;
                 epoll_ctl(g_epoller_fd, EPOLL_CTL_MOD, socket_, &ev);
             }

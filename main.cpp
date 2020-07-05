@@ -62,9 +62,10 @@ int main (int argc, const char **argv, const char **env) {
             char tmp[1024];
             snprintf(tmp, __size, "%s", __content);
             printf("on_recv: %s \n -------------------------------------------------------", tmp);
+            return __size;
         }
         virtual void on_connect(zif::iCore *__core) {
-            printf("on_connect\n ----------------------------------------------------------------");
+            printf("on_connect hello world\n");
         }
         virtual void on_disconnect(zif::iCore *__core) {
             printf("on_disconnect\n ----------------------------------------------------------------");

@@ -36,7 +36,7 @@ namespace core {
         p->socket_ = fd;
 
         struct epoll_event ev;
-        ev.data.ptr = (void *)&p->associate_;
+        ev.data.ptr = (void *)&p->association_;
         ev.events = EPOLLIN;
         if (-1 == epoll_ctl(g_epoller_fd, EPOLL_CTL_ADD, fd, &ev)) {
             ::close(fd);
@@ -53,7 +53,9 @@ namespace core {
     UDPer::UDPer(zif::iUDPSession *__session, const std::string &__ip, const s32 __port) 
         : session_(__session),
           socket_(-1), 
-          is_cache_(false), associate_(eCompletion::IO, this) ,addr_(__ip, __port) {}
+          is_cache_(false),
+          association_(eEpollEventType::IO, this),
+          addr_(__ip, __port) {}
 
     void UDPer::cache() {}
     void UDPer::load() {}
@@ -79,8 +81,8 @@ namespace core {
         debug(Core::instance(), "UDPer sendto %d bytes", rel);
     }
 
-    void UDPer::on_completer(zAssociate *__ac, const eCompletion __type, const struct epoll_event &__ev) {
-        zassert(__type == eCompletion::IO, "udper oncompleter type error");
+    void UDPer::on_epoll_event(sAssociation *__association, const eEpollEventType __type, const struct epoll_event &__ev) {
+        zassert(__type == eEpollEventType::IO, "udper oncompleter type error");
         s64 tick = tool::time::microseconds();
         do {
             struct sockaddr_in addr;
@@ -89,7 +91,7 @@ namespace core {
             addr.sin_port = htons(addr_.port);
             inet_pton(AF_INET, addr_.ip.c_str(), &addr.sin_addr.s_addr);
             s32 addr_len = sizeof(addr);
-            s32 len = ::recvfrom(socket_, recv_temp_, sizeof(recv_temp_), 0, (struct sockaddr *)&addr, (socklen_t *)addr_len);
+            s32 len = ::recvfrom(socket_, recv_temp_, sizeof(recv_temp_), 0, (struct sockaddr *)&addr, (socklen_t *)&addr_len);
             if (len > 0) {
                 session_->on_recv(Core::instance(), inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), recv_temp_, len);
             } else {
