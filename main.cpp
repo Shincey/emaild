@@ -15,6 +15,8 @@
 #include "logger.h"
 #include "zthread.h"
 
+#include "smtp_server.h"
+
 
 int main (int argc, const char **argv, const char **env) {
     // struct utsname uts;
@@ -56,37 +58,37 @@ int main (int argc, const char **argv, const char **env) {
     //     recover_to_pool(_pool, p);
     // }
 
-    class TCPSession : public zif:: iTCPSession {
-    public:
-        virtual int on_recv(zif::iCore *__core, const void *__content, const int __size) {
-            char tmp[1024];
-            snprintf(tmp, __size, "%s", (const char *)__content);
-            printf("on_recv: %s\n", tmp);
-            return __size;
-        }
-        virtual void on_connect(zif::iCore *__core) {
-            printf("on_connect hello world\n");
-        }
-        virtual void on_disconnect(zif::iCore *__core) {
-            printf("on_disconnect\n");
-        }
-        virtual void on_connect_failed(zif::iCore *__core) {
-            printf("on_connect_failed\n");
-        }
-    };
+    // class TCPSession : public zif:: iTCPSession {
+    // public:
+    //     virtual int on_recv(zif::iCore *__core, const void *__content, const int __size) {
+    //         char tmp[1024];
+    //         snprintf(tmp, __size, "%s", (const char *)__content);
+    //         printf("on_recv: %s\n", tmp);
+    //         return __size;
+    //     }
+    //     virtual void on_connect(zif::iCore *__core) {
+    //         printf("on_connect hello world\n");
+    //     }
+    //     virtual void on_disconnect(zif::iCore *__core) {
+    //         printf("on_disconnect\n");
+    //     }
+    //     virtual void on_connect_failed(zif::iCore *__core) {
+    //         printf("on_connect_failed\n");
+    //     }
+    // };
 
-    class TCPServer : public zif::iTCPServer {
-    public:
-        virtual zif::iTCPSession * on_malloc_connection(zif::iCore *__core, const char *__remote_ip, const s32 __remote_port) {
-            return new TCPSession;
-        }
-        virtual void on_error(zif::iCore *__core, zif::iTCPSession *__session) {
-            printf("on_error\n");
-        }
-        virtual void on_release(zif::iCore *__core) {
-            printf("on_release\n");
-        }
-    };
+    // class TCPServer : public zif::iTCPServer {
+    // public:
+    //     virtual zif::iTCPSession * on_malloc_connection(zif::iCore *__core, const char *__remote_ip, const s32 __remote_port) {
+    //         return new TCPSession;
+    //     }
+    //     virtual void on_error(zif::iCore *__core, zif::iTCPSession *__session) {
+    //         printf("on_error\n");
+    //     }
+    //     virtual void on_release(zif::iCore *__core) {
+    //         printf("on_release\n");
+    //     }
+    // };
     
     core::Core::instance()->parse_args(argc, argv);
     if (core::Core::instance()->get_args("pause")) {
@@ -99,7 +101,7 @@ int main (int argc, const char **argv, const char **env) {
 
     core::Core::instance()->launch();
 
-    zif::iTCPServer *tcpsvr = new TCPServer;
+    zif::iTCPServer *tcpsvr = new smtp::SMTPServer;
     core::Core::instance()->launch_tcp_server(tcpsvr, "127.0.0.1", 3200, 1024, 1024);
 
     while (true) {

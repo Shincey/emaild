@@ -30,10 +30,13 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/public"
                     "${PROJECT_SOURCE_DIR}/src/server/log"
                     "${PROJECT_SOURCE_DIR}/src/server/udp"
                     "${PROJECT_SOURCE_DIR}/src/server/tcp"
+                    "${PROJECT_SOURCE_DIR}/src/smtp/types"
+                    "${PROJECT_SOURCE_DIR}/src/smtp/server"
 )
 
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/public)
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/server)
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/src/smtp)
 
 AUX_SOURCE_DIRECTORY(. MAIN)
 
@@ -43,10 +46,10 @@ AUX_SOURCE_DIRECTORY(. MAIN)
 
 #add_definitions(" -Wall -D DEBUG_MODE -std=c++17")
 
-add_executable(emaild ${MAIN})
+add_executable(emaild ${MAIN} )
 
 #指明可执行文件需要链接的库
-TARGET_LINK_LIBRARIES(emaild LIB_PUBLIC LIB_SERVER)
+TARGET_LINK_LIBRARIES(emaild LIB_PUBLIC LIB_SERVER LIB_SMTP)
 
 #set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 #set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

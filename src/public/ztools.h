@@ -114,6 +114,15 @@ namespace tool {
         return __res.size();
     }
 
+    inline std::string strip(const std::string &__str, char ch=' ') {
+        if (__str.empty()) return std::string();
+        int i = 0, j = __str.size() - 1;
+        while (__str[i] == ch) i++;
+        while (__str[j] == ch) j--;
+        if (i > j) return std::string();
+        return __str.substr(i, j - i + 1);
+    }
+
     inline s32 str_to_int(const char *__val) {
         zassert(__val, "null pointer");
         return atoi(__val);
@@ -164,8 +173,15 @@ namespace tool {
         return s_seed % __range;
     }
 
+}
+
     inline std::string& operator<<(std::string &__target, const std::string &__val) {
         __target += __val;
+        return __target;
+    }
+
+    inline std::string& operator<<(std::string &__target, const char *__val) {
+        __target += std::string(__val);
         return __target;
     }
 
@@ -183,9 +199,5 @@ namespace tool {
         __target += tool::float_to_str(__val);
         return __target;
     }
-
-
-}
-
 
 #endif // __ZTOOLS_H__

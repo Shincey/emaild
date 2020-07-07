@@ -10,14 +10,14 @@ namespace core {
     lib::zpool<sAssociation> g_associate_pool;
 
 
-    Accepter::Accepter(zif::iTCPServer * __server, const char *__ip, const s32 __port, s32 __ssize, s32 __rsize)
+    Accepter::Accepter(zif::iTCPServer *__server, const char *__ip, const s32 __port, s32 __ssize, s32 __rsize)
     : server_(__server), socket_(-1), address_(__ip, __port), ssize_(__ssize <= MAX_PIPE_SIZE ? __ssize : MAX_PIPE_SIZE),
       rsize_(__rsize <= MAX_PIPE_SIZE ? __rsize : MAX_PIPE_SIZE), association_(eEpollEventType::Accept, this)
     {
 
     }
 
-    Accepter * Accepter::create(zif::iTCPServer * __server, const char *__ip, const s32 __port, s32 __ssize, s32 __rsize) {
+    Accepter * Accepter::create(zif::iTCPServer *__server, const char *__ip, const s32 __port, s32 __ssize, s32 __rsize) {
         zassert(__server, "something wrong with server");
         //struct timeval tv;
         struct sockaddr_in addr;
