@@ -209,7 +209,7 @@ namespace core {
                 __session->on_connect_failed(Core::instance());
                 ::close(sockfd);
                 recover_to_pool(g_tcper_pool, tcp);
-                //recover_to_pool(g_associate_pool, associate);                        ----- ???
+                recover_to_pool(g_associate_pool, associate);                        //----- ???
                 return nullptr;
             }
         }

@@ -166,12 +166,12 @@ namespace tool {
         }
     }
 
-    inline s32 rand(s32 __range) {
-        if (0 == __range) { return 0; }
-        static u64 s_seed = time::milliseconds();
-        s_seed = (((s_seed = s_seed * 214013L + 2531011L) >> 16) & 0x7fff);
-        return s_seed % __range;
-    }
+    // inline s32 rand(s32 __range) {
+    //     if (0 == __range) { return 0; }
+    //     static u64 s_seed = time::milliseconds();
+    //     s_seed = (((s_seed = s_seed * 214013L + 2531011L) >> 16) & 0x7fff);
+    //     return s_seed % __range;
+    // }
 
 }
 

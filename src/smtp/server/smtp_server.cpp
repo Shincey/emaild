@@ -5,6 +5,9 @@ namespace smtp {
         char tmp[1024];
         snprintf(tmp, __size, "%s", (const char *)__content);
         printf("on_recv: %s\n", tmp);
+
+        const char *sendstr = "hello! I received your message!\n";
+        send(sendstr, strlen(sendstr));
         return __size;
     }
 
